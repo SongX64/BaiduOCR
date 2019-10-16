@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
+		<title>百度API</title>
+		<style type="text/css">
+			canvas {
+				border-style: solid;
+				margin: 10px 0px 10px 0px;
+				width: 100%;
+				height: auto;
+			}
+
+			#transcription {
+				width: 100%;
+				height: auto;
+			}
+		</style>
+	</head>
+
+	<body>
+		<h1 align="center">百度OCR</h1>
+		<input type="file" onchange="load_file()" id="picker">
+		<br>
+		<canvas id="myCanvas"></canvas>
+		<br>
+		<p id="transcription"></p>
+	</body>
+	
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script>
+		var access_token = "24.fd277fa197ea027d98c2ce8890925234.2592000.1566220522.282335-16846315"; //百度access_token
+		<
+		script type = "text/javascript" >
+			//选择文件,包括拍照了
+			function load_file() {
+
+				var file = document.getElementById('picker').files[0];
+				var reader = new FileReader();
+				reader.readAsDataURL(file);
+
+				reader.onload = function(e) {
+
+
+					var img = new Image();
+					//解决跨域问题
+					img.crossOrigin = "Anonymous";
+					img.src = reader.result;
+
+					var canvas;
+					var ctx;
+
+
+
+					//图片加载完成触发
+					img.onload = function() {
+						canvas = document.getElementById("myCanvas");
+						/* canvas.width = img.width;
+						canvas.height = img.height; */
+
+						//图片压缩
+						if (img.height >= img.width) {
+							if (img.height > 1000) {
+								canvas.height = 1000;
+								canvas.width = img.width / (img.height / 1000);
+							}
+						} else {
+							if (img.width > 1000) {
+								canvas.width = 1000;
+								canvas.height = img.height / (img.width / 1000);
+							}
+						}
+
+
+						ctx = canvas.getContext("2d");
+						ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+						var dataurl = canvas.toDataURL("image/jpeg", 0.92);
+						console.log(dataurl);
+						document.getElementById("transcription").innerText = dataurl;
+						//ProcessToGrayImage(ctx, canvas); //灰度化
+						//OTSUAlgorithm(); //二值化
+
+						ocrText(dataurl); //识别
+						
+
+					}
+				}
+			}
+
+		//识别,调用百度API,POST方式,接受JSON串
+		function ocrText(img_b64) {
+
+		}
+	</script>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Demo</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<style type="text/css">
+			#showImg {
+				height: auto;
+				width: 100%;
+			}
+		</style>
+	</head>
+
+	<body>
+		<input type="file" id="img" onchange="getImg(event)" /><br>
+		<img id="showImg" src="" />
+		<div id="reposeMeg">
+
+		</div>
+		<div id="ocrResult"></div>
+	</body>
+
+
+	<script src="../js/jquery.min.js"></script>
+	<script>
+		var access_token = "24.fd277fa197ea027d98c2ce8890925234.2592000.1566220522.282335-16846315"; //百度access_token
+		// 监听图片选择事件
+		function getImg(event) {
+			var imageBase = "";
+			var reader = new FileReader();
+			reader.readAsDataURL(event.target.files[0]);
+			reader.onload = function(e) {
+				imageBase = e.target.result.replace("data:image/jpeg;base64,", "");
+				$("#showImg").prop("src", "data:image/jpeg;base64," + imageBase);
+				$.ajax({
+					header: {
+						"Content-Type": "application/x-www-form-urlencoded"
+					},
+					type: "post",
+					url: "https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic", //通用文字识别
+					async: true,
+					data: {
+						access_token: access_token,
+						detect_direction: true,
+						//unified_valid_period:true,
+						image: imageBase
+					},
+					dataType: "json",
+					timeout: 30000,
+					success: function(data) {
+						console.log("解析成功");
+						console.log(JSON.stringify(data));
+
+						//输出一下
+						document.getElementById("reposeMeg").innerText = "解析成功";
+						var stringA = "";
+						for (var i = 0; i < data.words_result_num; i++) {
+							//stringA += data.words_result[i].words.replace(/\s*/g, "");
+							stringA += data.words_result[i].words;
+							stringA += "\n";
+
+						}
+						document.getElementById("ocrResult").innerText = stringA;
+
+
+
+					},
+					error: function(xhr) {
+						console.log("请求解析失败");
+						document.getElementById("reposeMeg").innerText = "解析失败";
+						alert("识别失败！");
+					}
+				});
+			}
+		}
+	</script>
+
+</html>
